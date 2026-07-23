@@ -16,6 +16,7 @@ const dataDir = path.join(__dirname, 'data');
 const projectsFile = path.join(dataDir, 'projects.json');
 const tasksFile = path.join(dataDir, 'tasks.json');
 const campaignsFile = path.join(dataDir, 'campaigns.json');
+const notesFile = path.join(dataDir, 'notes.json');
 
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
@@ -186,6 +187,29 @@ app.delete('/api/campaigns/:id', (req, res) => {
   res.json({ success: true });
 });
 
+app.get('/api/notes', (req, res) => res.json(readJSON(notesFile, [])));
+
+app.post('/api/notes', (req, res) => {
+  const notes = readJSON(notesFile, []);
+  const note = { id: Date.now(), title: req.body.title || '', content: req.body.content || '', color: req.body.color || 'yellow', pinned: false, createdAt: new Date().toISOString() };
+  notes.unshift(note);
+  writeJSON(notesFile, notes);
+  res.json(note);
+});
+
+app.put('/api/notes/:id', (req, res) => {
+  const notes = readJSON(notesFile, []);
+  const idx = notes.findIndex(n => n.id === parseInt(req.params.id));
+  if (idx !== -1) { notes[idx] = { ...notes[idx], ...req.body }; writeJSON(notesFile, notes); res.json(notes[idx]); }
+  else res.status(404).json({ error: 'Not found' });
+});
+
+app.delete('/api/notes/:id', (req, res) => {
+  const notes = readJSON(notesFile, []);
+  writeJSON(notesFile, notes.filter(n => n.id !== parseInt(req.params.id)));
+  res.json({ success: true });
+});
+
 const chatHistoryFile = path.join(dataDir, 'chat.json');
 
 const CLAUDE_TOOLS = [
@@ -233,11 +257,25 @@ const CLAUDE_TOOLS = [
       },
       required: ['name']
     }
+  },
+  {
+    name: 'add_note',
+    description: 'Aggiunge una nota nella sezione Note del dashboard',
+    input_schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string', description: 'Titolo breve della nota' },
+        content: { type: 'string', description: 'Contenuto della nota' },
+        color: { type: 'string', enum: ['yellow', 'pink', 'green', 'blue', 'purple'], description: 'Colore della nota (default yellow)' }
+      },
+      required: ['title', 'content']
+    }
   }
 ];
 
 async function runClaudeAgent(message, projects, tasks, campaigns) {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const notes = readJSON(notesFile, []);
 
   const systemPrompt = `Sei l'agente personale di Walter, imprenditore italiano che gestisce Paradise Beauty (salone di bellezza) e progetti tech.
 
@@ -245,8 +283,9 @@ DATI ATTUALI:
 Progetti: ${JSON.stringify(projects.map(p => ({ id: p.id, name: p.name, completion: p.completion, status: p.status })))}
 Tasks: ${JSON.stringify(tasks.map(t => ({ id: t.id, name: t.name, completed: t.completed })))}
 Campagne Ads: ${JSON.stringify(campaigns.map(c => ({ id: c.id, name: c.name, platform: c.platform, budgetAllocated: c.budgetAllocated, budgetSpent: c.budgetSpent, status: c.status })))}
+Note: ${JSON.stringify(notes.map(n => ({ id: n.id, title: n.title, content: n.content })))}
 
-Rispondi sempre in italiano. Sii conciso e diretto. Usa gli strumenti quando serve per modificare i dati. Usa **grassetto** per evidenziare numeri e nomi importanti.`;
+Rispondi sempre in italiano. Sii conciso e diretto. Usa gli strumenti quando serve per modificare i dati. Per richieste come "aggiungi nota", "segna", "ricordami" usa add_note. Usa **grassetto** per evidenziare numeri e nomi importanti.`;
 
   const messages = [{ role: 'user', content: message }];
   let progettoAggiornato = false;
@@ -296,6 +335,10 @@ Rispondi sempre in italiano. Sii conciso e diretto. Usa gli strumenti quando ser
           const ps = readJSON(projectsFile, []); ps.push(newProj); writeJSON(projectsFile, ps);
           progettoAggiornato = true;
           result = `Progetto "${block.input.name}" creato (id: ${newProj.id})`;
+        } else if (block.name === 'add_note') {
+          const newNote = { id: Date.now(), title: block.input.title, content: block.input.content, color: block.input.color || 'yellow', pinned: false, createdAt: new Date().toISOString() };
+          const ns = readJSON(notesFile, []); ns.unshift(newNote); writeJSON(notesFile, ns);
+          result = `Nota "${block.input.title}" aggiunta`;
         }
         toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: result });
       }

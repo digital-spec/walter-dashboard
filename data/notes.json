@@ -1,0 +1,10 @@
+[
+  {
+    "id": 1,
+    "title": "Benvenuto nelle Note",
+    "content": "Scrivi all'agente: \"aggiungi nota: testo\" oppure usa il + in alto.",
+    "color": "pink",
+    "pinned": true,
+    "createdAt": "2026-07-23T00:00:00.000Z"
+  }
+]

@@ -216,6 +216,27 @@
     ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
     ::-webkit-scrollbar-track{background:transparent}
 
+    /* ── NOTES ── */
+    .notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+    .note-card{border-radius:12px;padding:14px;position:relative;cursor:pointer;transition:.15s;border:1.5px solid transparent}
+    .note-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.08)}
+    .note-card.pinned::before{content:'📌';position:absolute;top:8px;right:10px;font-size:12px}
+    .note-card.nc-yellow{background:#fef9c3;border-color:#fde047}
+    .note-card.nc-pink{background:#fce7f3;border-color:#f9a8d4}
+    .note-card.nc-green{background:#d1fae5;border-color:#6ee7b7}
+    .note-card.nc-blue{background:#dbeafe;border-color:#93c5fd}
+    .note-card.nc-purple{background:#ede9fe;border-color:#c4b5fd}
+    .note-title{font-size:12px;font-weight:700;color:#18181b;margin-bottom:6px;line-height:1.3}
+    .note-content{font-size:11px;color:#3f3f46;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+    .note-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid rgba(0,0,0,.06)}
+    .note-date{font-size:9px;color:#71717a}
+    .note-actions{display:flex;gap:4px}
+    .note-btn{background:none;border:none;cursor:pointer;font-size:11px;padding:2px 5px;border-radius:4px;opacity:.6;transition:.15s}
+    .note-btn:hover{opacity:1;background:rgba(0,0,0,.06)}
+    .nc-dots{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .nc-dot{width:18px;height:18px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:.15s}
+    .nc-dot.on{border-color:#18181b;transform:scale(1.15)}
+
     /* ── MOBILE ── */
     .ham{display:none;align-items:center;justify-content:center;width:32px;height:32px;background:transparent;border:1px solid var(--border);border-radius:7px;cursor:pointer;font-size:15px;color:var(--text2);flex-shrink:0}
     .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:499}
@@ -391,6 +412,7 @@
     <div class="tab" id="tab-proj" onclick="openTab('proj')">📊 Progetti</div>
     <div class="tab" id="tab-ads" onclick="openTab('ads')">💰 Ads</div>
     <div class="tab" id="tab-tasks" onclick="openTab('tasks')">📋 Tasks</div>
+    <div class="tab" id="tab-notes" onclick="openTab('notes')">📝 Note</div>
     <div class="tab" id="tab-analytics" onclick="openTab('analytics')">📈 Analytics</div>
     <div class="tab" id="tab-chat" onclick="openTab('chat')">🤖 Agente</div>
   </div>
@@ -447,6 +469,15 @@
       <button class="btn btn-p" style="font-size:11px" onclick="openM('mTask')">+ Nuova</button>
     </div>
     <div id="task-list"></div>
+  </div>
+
+  <!-- NOTE -->
+  <div class="view" id="view-notes">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <span style="font-size:14px;font-weight:600">📝 Note</span>
+      <button class="btn btn-p" style="font-size:11px" onclick="openM('mNote')">+ Nuova Nota</button>
+    </div>
+    <div class="notes-grid" id="notes-grid"></div>
   </div>
 
   <!-- ANALYTICS -->
@@ -546,6 +577,28 @@
   </div>
 </div>
 
+<!-- MODAL NOTE -->
+<div class="modal" id="mNote">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeM('mNote')">×</button>
+    <div class="modal-t" id="mNote-t">📝 Nuova Nota</div>
+    <input type="hidden" id="en-id">
+    <div class="fg"><label>Titolo</label><input id="n-title" type="text" placeholder="Es: Chiamare fornitore"></div>
+    <div class="fg"><label>Contenuto</label><textarea id="n-content" style="width:100%;padding:8px 11px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:12px;font-family:inherit;outline:none;resize:vertical;min-height:90px" placeholder="Scrivi qui..."></textarea></div>
+    <div class="fg">
+      <label>Colore</label>
+      <div class="nc-dots">
+        <div class="nc-dot on" style="background:#fef9c3;border-color:#fde047" data-c="yellow" onclick="pickNc('yellow',this)"></div>
+        <div class="nc-dot" style="background:#fce7f3" data-c="pink" onclick="pickNc('pink',this)"></div>
+        <div class="nc-dot" style="background:#d1fae5" data-c="green" onclick="pickNc('green',this)"></div>
+        <div class="nc-dot" style="background:#dbeafe" data-c="blue" onclick="pickNc('blue',this)"></div>
+        <div class="nc-dot" style="background:#ede9fe" data-c="purple" onclick="pickNc('purple',this)"></div>
+      </div>
+    </div>
+    <button onclick="saveNote()" class="btn btn-p" style="width:100%;padding:10px;margin-top:13px">Salva Nota</button>
+  </div>
+</div>
+
 <!-- MODAL GOAL -->
 <div class="modal" id="mGoal">
   <div class="modal-box">
@@ -564,6 +617,7 @@
   <button class="mob-tab" id="mtab-proj" onclick="openTab('proj')"><div class="mico">📊</div>Progetti</button>
   <button class="mob-tab" id="mtab-ads" onclick="openTab('ads')"><div class="mico">💰</div>Ads</button>
   <button class="mob-tab" id="mtab-tasks" onclick="openTab('tasks')"><div class="mico">📋</div>Tasks</button>
+  <button class="mob-tab" id="mtab-notes" onclick="openTab('notes')"><div class="mico">📝</div>Note</button>
   <button class="mob-tab" id="mtab-chat" onclick="openTab('chat')"><div class="mico">🤖</div>Agente</button>
 </nav>
 
@@ -611,14 +665,15 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelect
 /* LOAD */
 async function loadAll(){
   try{
-    const[projects,tasks,campaigns,stats]=await Promise.all([
+    const[projects,tasks,campaigns,stats,notes]=await Promise.all([
       fetch(API+'/projects').then(r=>r.json()),
       fetch(API+'/tasks').then(r=>r.json()),
       fetch(API+'/campaigns').then(r=>r.json()),
-      fetch(API+'/stats').then(r=>r.json())
+      fetch(API+'/stats').then(r=>r.json()),
+      fetch(API+'/notes').then(r=>r.json())
     ]);
     drawSidebar(projects);drawProjects(projects);drawTasks(tasks);drawCampaigns(campaigns);
-    updateMet(stats,projects,tasks,campaigns);drawHome(projects,tasks);
+    updateMet(stats,projects,tasks,campaigns);drawHome(projects,tasks);drawNotes(notes);
   }catch(e){console.error(e);}
 }
 
@@ -837,6 +892,61 @@ async function briefing(){
 }
 async function resetChat(){try{await fetch(API+'/reset',{method:'POST'});}catch(e){}document.getElementById('chat-msgs').innerHTML='';openTab('home');}
 function sendQ(m){document.getElementById('usr-in').value=m;sendMsg();}
+
+/* NOTES */
+let ncColor='yellow';
+function pickNc(c,el){ncColor=c;document.querySelectorAll('.nc-dot').forEach(d=>d.classList.remove('on'));if(el)el.classList.add('on');}
+function drawNotes(notes){
+  const pinned=notes.filter(n=>n.pinned),rest=notes.filter(n=>!n.pinned);
+  const all=[...pinned,...rest];
+  document.getElementById('notes-grid').innerHTML=all.length?all.map(n=>{
+    const d=new Date(n.createdAt).toLocaleDateString('it-IT',{day:'numeric',month:'short'});
+    return `<div class="note-card nc-${n.color}${n.pinned?' pinned':''}">
+      <div class="note-title">${n.title}</div>
+      <div class="note-content">${n.content}</div>
+      <div class="note-footer">
+        <span class="note-date">${d}</span>
+        <div class="note-actions">
+          <button class="note-btn" onclick="togglePin(${n.id})" title="${n.pinned?'Rimuovi pin':'Fissa'}">${n.pinned?'📌':'📍'}</button>
+          <button class="note-btn" onclick="editNote(${n.id})">✏️</button>
+          <button class="note-btn" onclick="delNote(${n.id})" style="color:#c0392b">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join(''):'<div style="text-align:center;color:var(--text3);padding:50px;font-size:12px">Nessuna nota — aggiungine una! 📝</div>';
+}
+async function saveNote(){
+  const id=document.getElementById('en-id').value;
+  const title=document.getElementById('n-title').value.trim();
+  const content=document.getElementById('n-content').value.trim();
+  if(!title)return;
+  await fetch(id?API+'/notes/'+id:API+'/notes',{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,content,color:ncColor})});
+  document.getElementById('en-id').value='';
+  document.getElementById('n-title').value='';
+  document.getElementById('n-content').value='';
+  document.getElementById('mNote-t').textContent='📝 Nuova Nota';
+  ncColor='yellow';
+  document.querySelectorAll('.nc-dot').forEach((d,i)=>{d.classList.toggle('on',i===0);});
+  closeM('mNote');loadAll();
+}
+async function editNote(id){
+  const ns=await fetch(API+'/notes').then(r=>r.json());
+  const n=ns.find(x=>x.id===id);if(!n)return;
+  document.getElementById('en-id').value=n.id;
+  document.getElementById('n-title').value=n.title;
+  document.getElementById('n-content').value=n.content;
+  document.getElementById('mNote-t').textContent='✏️ Modifica Nota';
+  ncColor=n.color||'yellow';
+  document.querySelectorAll('.nc-dot').forEach(d=>d.classList.toggle('on',d.dataset.c===ncColor));
+  openM('mNote');
+}
+async function togglePin(id){
+  const ns=await fetch(API+'/notes').then(r=>r.json());
+  const n=ns.find(x=>x.id===id);if(!n)return;
+  await fetch(API+'/notes/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({pinned:!n.pinned})});
+  loadAll();
+}
+async function delNote(id){if(confirm('Eliminare questa nota?')){await fetch(API+'/notes/'+id,{method:'DELETE'});loadAll();}}
 
 /* APPEARANCE */
 function setBr(v){document.getElementById('br-lbl').textContent=v+'%';document.body.style.filter='brightness('+v/100+')';localStorage.setItem('br',v);}
