@@ -10,7 +10,8 @@
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
-    "body-parser": "^1.20.2"
+    "body-parser": "^1.20.2",
+    "@anthropic-ai/sdk": "^0.39.0"
   },
   "keywords": ["dashboard", "projects", "ads", "tasks"],
   "author": "Walter",
