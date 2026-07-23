@@ -215,6 +215,74 @@
     ::-webkit-scrollbar{width:3px}
     ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
     ::-webkit-scrollbar-track{background:transparent}
+
+    /* ── MOBILE ── */
+    .ham{display:none;align-items:center;justify-content:center;width:32px;height:32px;background:transparent;border:1px solid var(--border);border-radius:7px;cursor:pointer;font-size:15px;color:var(--text2);flex-shrink:0}
+    .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:499}
+    .sb-overlay.on{display:block}
+    .mob-nav{display:none}
+
+    @media(max-width:768px){
+      body{height:auto;min-height:100vh;overflow:auto;padding-bottom:62px}
+      .main{flex-direction:column;overflow:visible}
+
+      /* sidebar drawer */
+      .sb{position:fixed;left:-280px;top:0;height:100%;z-index:500;transition:left .25s cubic-bezier(.4,0,.2,1);box-shadow:none;overflow-y:auto}
+      .sb.open{left:0;box-shadow:6px 0 24px rgba(0,0,0,.12)}
+      .ham{display:flex}
+
+      /* header */
+      .hdr{padding:0 12px}
+      .hdr-sub{display:none}
+      .pill-live{display:none}
+      .hdr-r .btn-o[onclick*="Agente"]{display:none}
+      .hdr-r .btn-o[onclick*="resetChat"]{display:none}
+
+      /* content */
+      .content{overflow:visible}
+      .met-bar{grid-template-columns:1fr 1fr}
+      .met-cell:nth-child(2){border-right:none}
+      .met-cell:nth-child(3){border-top:1px solid var(--border)}
+      .met-cell:nth-child(4){border-top:1px solid var(--border);border-right:none}
+      .met-val{font-size:17px}
+
+      /* tabs hidden — use bottom nav */
+      .tabs{display:none}
+
+      /* views */
+      .view{overflow-y:visible;padding:10px 12px}
+      .chat-view{height:calc(100dvh - 128px)}
+      .chat-input-row{position:sticky;bottom:62px}
+
+      /* grids */
+      .h2{grid-template-columns:1fr}
+      .ads-summary{grid-template-columns:1fr 1fr}
+      .cmp-met{grid-template-columns:1fr 1fr}
+      .analytics-grid{grid-template-columns:1fr}
+      .rm-grid{grid-template-columns:1fr 1fr 1fr}
+
+      /* project card */
+      .proj-full-card{gap:10px}
+      .proj-ring-lg{width:52px;height:52px}
+      .proj-actions{flex-direction:column;gap:4px;flex-shrink:0}
+
+      /* modal */
+      .modal-box{width:calc(100vw - 28px);margin:0}
+
+      /* bottom nav */
+      .mob-nav{
+        display:flex;position:fixed;bottom:0;left:0;right:0;height:58px;
+        background:var(--card);border-top:1px solid var(--border);z-index:400;
+        padding:0 4px;padding-bottom:env(safe-area-inset-bottom)
+      }
+      .mob-tab{
+        flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+        font-size:9px;font-weight:500;color:var(--text3);cursor:pointer;gap:1px;
+        border-radius:8px;transition:.15s;padding:4px 2px;border:none;background:none;font-family:inherit
+      }
+      .mob-tab .mico{font-size:19px;line-height:1}
+      .mob-tab.on{color:var(--pink)}
+    }
   </style>
 </head>
 <body>
@@ -222,6 +290,7 @@
 <!-- HEADER -->
 <div class="hdr">
   <div class="hdr-l">
+    <button class="ham" onclick="toggleSb()">☰</button>
     <svg width="30" height="30" viewBox="0 0 34 34" fill="none">
       <polygon points="17,2 31,9 31,25 17,32 3,25 3,9" stroke="#c8386a" stroke-width="1.5" fill="rgba(200,56,106,.07)"/>
       <polygon points="17,8 25,12 25,22 17,26 9,22 9,12" stroke="rgba(200,56,106,.3)" stroke-width="0.7" fill="#fff"/>
@@ -239,6 +308,8 @@
     <button class="btn btn-p" onclick="briefing()">Briefing</button>
   </div>
 </div>
+
+<div class="sb-overlay" onclick="closeSb()"></div>
 
 <div class="main">
 
@@ -487,6 +558,15 @@
   </div>
 </div>
 
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mob-nav">
+  <button class="mob-tab on" id="mtab-home" onclick="openTab('home')"><div class="mico">🏠</div>Home</button>
+  <button class="mob-tab" id="mtab-proj" onclick="openTab('proj')"><div class="mico">📊</div>Progetti</button>
+  <button class="mob-tab" id="mtab-ads" onclick="openTab('ads')"><div class="mico">💰</div>Ads</button>
+  <button class="mob-tab" id="mtab-tasks" onclick="openTab('tasks')"><div class="mico">📋</div>Tasks</button>
+  <button class="mob-tab" id="mtab-chat" onclick="openTab('chat')"><div class="mico">🤖</div>Agente</button>
+</nav>
+
 <script>
 const API='/api';
 let loading=false,rmIdx=0,rmEmoji='📌',chartsOk=false;
@@ -504,15 +584,22 @@ function pColor(p){return p>=70?'var(--green)':p>=30?'var(--pink)':'var(--amber)
 function projIco(n){const l=(n||'').toLowerCase();return l.includes('chat')||l.includes('bot')?'🤖':l.includes('pos')||l.includes('cash')?'🛒':'📁';}
 function statoInfo(s){const m={'in-progress':['In Corso','b-pink'],'paused':['In Pausa','b-amber'],'blocked':['Bloccato','b-red'],'done':['Completato','b-green'],'todo':['Da Fare','b-gray']};return m[s]||[s,'b-gray'];}
 
+/* SIDEBAR MOBILE */
+function toggleSb(){document.querySelector('.sb').classList.toggle('open');document.querySelector('.sb-overlay').classList.toggle('on');}
+function closeSb(){document.querySelector('.sb').classList.remove('open');document.querySelector('.sb-overlay').classList.remove('on');}
+
 /* TABS */
 function openTab(n){
   document.querySelectorAll('.view,.chat-view').forEach(v=>{v.classList.remove('on');v.style.display='none';});
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  const v=document.getElementById('view-'+n),t=document.getElementById('tab-'+n);
+  document.querySelectorAll('.mob-tab').forEach(t=>t.classList.remove('on'));
+  const v=document.getElementById('view-'+n),t=document.getElementById('tab-'+n),mt=document.getElementById('mtab-'+n);
   if(v){v.style.display=n==='chat'?'flex':'block';v.classList.add('on');}
   if(t)t.classList.add('on');
+  if(mt)mt.classList.add('on');
   if(n==='analytics'&&!chartsOk){drawCharts();chartsOk=true;}
   if(n==='chat')setTimeout(()=>document.getElementById('usr-in').focus(),80);
+  closeSb();
 }
 
 /* MODALS */
