@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1,
+    "name": "Paradise Beauty — Meta Summer",
+    "platform": "Meta Ads",
+    "budgetAllocated": 500,
+    "budgetSpent": 312,
+    "impressions": 42000,
+    "clicks": 980,
+    "status": "active",
+    "createdAt": "2025-07-01T00:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "TikTok Clip Promo Luglio",
+    "platform": "TikTok Ads",
+    "budgetAllocated": 200,
+    "budgetSpent": 88,
+    "impressions": 18500,
+    "clicks": 420,
+    "status": "active",
+    "createdAt": "2025-07-10T00:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "name": "Google Search — Extension Hair",
+    "platform": "Google Ads",
+    "budgetAllocated": 300,
+    "budgetSpent": 175,
+    "impressions": 9800,
+    "clicks": 310,
+    "status": "active",
+    "createdAt": "2025-07-05T00:00:00.000Z"
+  }
+]

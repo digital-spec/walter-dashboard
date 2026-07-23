@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Correggere bug risposta chatbot",
+    "completed": false,
+    "createdAt": "2025-07-20T00:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "Completare riepilogo Google Sheet (Confermamento)",
+    "completed": false,
+    "createdAt": "2025-07-20T00:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "name": "Setup iniziale Cahmistics POS",
+    "completed": true,
+    "createdAt": "2025-07-18T00:00:00.000Z"
+  },
+  {
+    "id": 1784816801765,
+    "name": "chiamare il fornitore domani",
+    "completed": false,
+    "createdAt": "2026-07-23T14:26:41.765Z"
+  }
+]

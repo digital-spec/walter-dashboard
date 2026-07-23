@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "Chatbot PaymeGeot",
+    "description": "AI Chatbot integrato con PaymeGPT — correzioni e features avanzate",
+    "status": "in-progress",
+    "completion": 65,
+    "deadline": "2025-12-31",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "Confermamento System",
+    "description": "Sistema di conferme automatiche — in riepilogo su Google Sheet",
+    "status": "paused",
+    "completion": 40,
+    "deadline": "2025-10-01",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "name": "Cahmistics POS",
+    "description": "Implementazione POS — deadline fine agosto",
+    "status": "in-progress",
+    "completion": 15,
+    "deadline": "2025-08-31",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  }
+]
